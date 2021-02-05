@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi
+spec:
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: perl
+        command: ["perl", "Mbignum=bpi", "-wle", "print bpi(2000)"]
+      # can also be specified as onFailure which would restart container, in
+      # this case new Pod is created upon failure
+      restartPolicy: never
+  # number of retries after which Job is considered to have failed entirely,
+  # defaults to 6
+  backoffLimit: 4

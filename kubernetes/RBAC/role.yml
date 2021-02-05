@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: demo-role
+rules:
+  - apiGroups: [""]
+    resource: ["pods"]
+	# can also specify resources by names
+	# resourceNames: ["demo-pod"]
+	verbs: ["get", "list", "watch"]

@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: my-cronjob
+spec:
+  schedule: "*/1 * * * *"
+  startingDeadlineSeconds: 3600 # optional, check later
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobtemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: my-cron
+            image: busybox
+            args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from your Kubernetes cluster
+          restartPolicy: OnFailure #could also be Always or Never

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pd-volume
+spec:
+  storageClassName: "standard"
+  capacity:
+    storage: 100G
+  accessModes:
+  - ReadWriteOnce
+  gcePersistentDisk:
+    pdName: demo-disk
+    fsType: ext4

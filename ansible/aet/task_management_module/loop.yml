@@ -1,0 +1,44 @@
+---
+- hosts: server1
+  vars:
+    packages: ['git', 'vim', 'python']
+  tasks:
+    - name: file
+      file:
+        dest: "/tmp/{{ item }}"
+        state: "{{ file_state }}"
+      with_items: "{{ packages }}"
+    - name: summary
+      template:
+        dest: "/tmp/summary"
+        src: "templates/loop.j2"
+
+- hosts: db1
+  vars:
+    animals:
+      cats:
+        one:
+          color: white
+          characeter: friendly
+        two:
+          color: grey
+          characeter: mean
+      dogs:
+        three:
+          color: brown
+          shape: fit
+        four:
+          color: black
+          shape: lazy
+  tasks:
+    - name: file
+      file:
+        dest: "/tmp/{{ item.key }}-{{ item.value.color }}"
+        state: "{{ file_state }}"
+      with_dict: "{{ animals.cats }}"
+    - name: file
+      file:
+        dest: "/tmp/{{ item.key }}-{{ item.value.color }}"
+        state: "{{ file_state }}"
+      with_dict: "{{ animals.dogs }}"
+      when: item.value.color == 'black'

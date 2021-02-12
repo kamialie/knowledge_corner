@@ -1,0 +1,6 @@
+---
+- hosts: localhost
+  tasks:
+    - name: show password
+      debug:
+        msg: "password is {{ password }}"

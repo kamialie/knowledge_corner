@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - include_role:
+        name: create_file
+      vars:
+        file_name: file

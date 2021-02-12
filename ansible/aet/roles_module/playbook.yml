@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  connection: local
+  tasks:
+    - name: create file
+      file:
+        dest: "{{ ansible_user_dir }}/file"
+        state: "{{ state }}"

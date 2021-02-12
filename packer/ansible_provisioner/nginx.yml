@@ -1,0 +1,17 @@
+---
+- name: Nginx installation
+  become: true
+  hosts: all
+  roles:
+    - role: nginxinc.nginx
+  post_tasks:
+    - name: upload website files
+      copy:
+        src: ../files/website
+        dest: /var/www/html
+        mode: 0644
+    - name: allow http traffic
+      ufw:
+        rule: allow
+        port: 80
+        proto: tcp

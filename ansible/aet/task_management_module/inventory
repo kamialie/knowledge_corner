@@ -1,0 +1,22 @@
+[all]
+server1 ansible_user=ubuntu ansible_host=18.194.195.157 ansible_ssh_private_key_file=/Users/yoko/terraform/tf_key.pem
+server2 ansible_user=ubuntu ansible_host=18.197.109.62 ansible_ssh_private_key_file=/Users/yoko/terraform/tf_key.pem
+db1 ansible_user=ubuntu ansible_host=3.124.194.195 ansible_ssh_private_key_file=/Users/yoko/terraform/tf_key.pem
+db2 ansible_user=ubuntu ansible_host=18.156.136.8 ansible_ssh_private_key_file=/Users/yoko/terraform/tf_key.pem
+
+[server]
+server1
+server2
+
+[db]
+db1
+db2
+
+[backup]
+db2 backup_file=/tmp/backup_file
+
+[all:vars]
+all_file=/tmp/all_file
+
+[server:vars]
+server_file=/tmp/server_file

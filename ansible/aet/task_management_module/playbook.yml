@@ -1,0 +1,29 @@
+---
+- hosts: all
+  tasks:
+    - name: file on all remote
+      file:
+        dest: "{{ all_file }}"
+        state: "{{ file_state }}"
+
+- hosts: server
+  tasks:
+    - name: file on servers
+      file:
+        dest: "{{ server_file }}"
+        state: "{{ file_state }}"
+
+- hosts: all:!db
+  tasks:
+    - name: file on db
+      file:
+        dest: "{{ db_file }}"
+        state: "{{ file_state }}"
+      when: db_file is defined
+
+- hosts: all:&backup:!server
+  tasks:
+    - name: file on backup
+      file:
+        dest: "{{ backup_file }}"
+        state: "{{ file_state }}"

@@ -1,0 +1,5 @@
+---
+- name: create file
+  file:
+    dest: "{{ ansible_user_dir }}/{{ file_name }}"
+    state: "{{ state }}"

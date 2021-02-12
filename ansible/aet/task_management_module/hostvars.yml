@@ -1,0 +1,14 @@
+---
+- hosts: server
+  tasks:
+    - name: file
+      file:
+        dest: /tmp/server2-on-server1
+        state: "{{ file_state }}"
+      when: hostvars[inventory_hostname]['inventory_hostname'] == 'server1'
+
+    - name: file
+      file:
+        dest: /tmp/server1-on-server2
+        state: "{{ file_state }}"
+      when: inventory_hostname == 'server2'

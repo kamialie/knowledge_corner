@@ -1,0 +1,8 @@
+---
+ub_nginx_user: www-data
+ub_nginx_group: www-data
+cent_nginx_user: nginx
+cent_nginx_group: nginx
+web_root: /var/www
+web_file: index.html
+color: red

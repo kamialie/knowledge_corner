@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include simple_web"
+      include_role:
+        name: "simple_web"

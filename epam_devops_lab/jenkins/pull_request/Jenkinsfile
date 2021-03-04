@@ -1,0 +1,75 @@
+pipeline {
+	agent any
+	environment {
+		PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+		VIRTUAL_ENV = "/home/ubuntu/virtual_env"
+	}
+	options {
+		ansiColor('xterm')
+	}
+	stages {
+		stage ('Display versions') {
+			steps {
+				sh "env"
+				sh '''#!/bin/bash
+				source $VIRTUAL_ENV/bin/activate
+				docker -v
+				python -V
+				ansible --version
+				molecule --version
+				'''
+			}
+		}
+		stage ('Molecule converge') {
+			steps {
+				dir("ansible/roles/simple_web") {
+					sh '''#!/bin/bash
+					source $VIRTUAL_ENV/bin/activate
+					molecule converge
+					'''
+				}
+			}
+		}
+		stage ('Molecule verify') {
+			steps {
+				dir("ansible/roles/simple_web") {
+					sh '''#!/bin/bash
+					source $VIRTUAL_ENV/bin/activate
+					molecule verify
+					'''
+				}
+			}
+		}
+	}
+	post {
+		always {
+			dir("ansible/roles/simple_web") {
+				sh '''#!/bin/bash
+				source $VIRTUAL_ENV/bin/activate
+				molecule destroy
+				'''
+			}
+      cleanWs()
+		}
+		success {
+			script {
+				setBuildStatus("Succeeded", "SUCCESS")
+			}
+		}
+		failure {
+			script {
+				setBuildStatus("Succeeded", "FAILURE")
+			}
+		}
+	}
+}
+
+void  setBuildStatus(String message, String state) {
+  step([
+      $class: "GitHubCommitStatusSetter",
+      reposSource: [$class: "ManuallyEnteredRepositorySource", url: "https://github.com/wise-Kaas/epam_learning_devops"],
+      contextSource: [$class: "ManuallyEnteredCommitContextSource", context: "feature"],
+      errorHandlers: [[$class: "ChangingBuildStatusErrorHandler", result: "UNSTABLE"]],
+      statusResultSource: [ $class: "ConditionalStatusResultSource", results: [[$class: "AnyBuildResult", message: message, state: state]] ]
+  ]);
+}

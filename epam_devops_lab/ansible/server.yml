@@ -1,0 +1,106 @@
+---
+- name: Prepare Molecule environment
+  hosts: server
+  tags:
+    - python
+  vars_files:
+    - vars/external_vars.yml
+  tasks:
+    - name: apt update and upgrade
+      apt:
+        update_cache: yes
+        upgrade: full
+      become: true
+    - name: install required system packages
+      apt:
+        name: "{{ system_packages_for_python_venv }}"
+        state: latest
+      become: true
+    - name: install wheel in Python venv
+      pip:
+        name: wheel
+        virtualenv: "{{ venv_path }}"
+        virtualenv_command: "python3 -m venv"
+    - name: install Molecule in Python venv
+      pip:
+        name: "{{ molecule_packages }}"
+        virtualenv: "{{ venv_path }}"
+
+- name: Install Jenkins
+  hosts: server
+  become: true
+  tags:
+    - jenkins
+  vars_files:
+    - vars/external_vars.yml
+  roles:
+    - role: geerlingguy.java
+    - role: geerlingguy.jenkins
+
+- name: Install Docker
+  hosts: server
+  become: true
+  tags:
+    - docker
+  vars_files:
+    - "vars/external_vars.yml"
+  tasks:
+    - name: install required system packages
+      apt:
+        name: "{{ system_packages_for_docker_installation }}"
+        state: latest
+        update_cache: yes
+    - name: add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    - name: add Docker repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+    - name: update apt and install docker-ce
+      apt:
+        name: "{{ docker_packages }}"
+        state: latest
+        update_cache: yes
+    - name: add default user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+- name: Setup Jenkins and Docker
+  hosts: server
+  become: true
+  tags:
+    - jenkins_setup
+  tasks:
+    - name: add Jenkins user to docker group
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+    - name: restart Jenkins
+      service:
+        name: jenkins
+        state: restarted
+
+- name: Install terraform and AWS cli
+  hosts: server
+  become: true
+  tags:
+    - terraform
+  tasks:
+    - name: add HashiCorp GPG apt Key
+      apt_key:
+        url: https://apt.releases.hashicorp.com/gpg
+        state: present
+    - name: add HashiCorp repository
+      apt_repository:
+        repo: deb https://apt.releases.hashicorp.com focal main
+        state: present
+    - name: update apt and install terraform, aws cli
+      apt:
+        name: ["terraform", "awscli"]
+        state: latest
+        update_cache: yes

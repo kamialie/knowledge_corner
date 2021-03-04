@@ -1,0 +1,128 @@
+---
+- name: PHP
+  hosts: all
+  become: true
+  tags:
+    - php
+  vars:
+    packages:
+      - php7.3-curl
+      - php7.3-gd
+      - php7.3-cli
+      - php7.3-fpm
+      - php7.3-mysql
+      - php7.3-json
+      - php7.3-opcache
+      - php7.3-mbstring
+      - php7.3-xml
+  tasks:
+    - name: list packages
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ packages }}"
+      tags:
+        - php-debug
+    - name: install modules
+      apt:
+        name: "{{ packages }}"
+        state: present
+
+- name: MySQL
+  hosts: all
+  become: true
+  tags:
+    - sql
+  vars:
+    - root_password: secure-password
+    - db_name: wordpress
+    - user: wordpressuser
+    - password: password
+  roles:
+    - role: geerlingguy.mysql
+      vars:
+        - mysql_root_password: "{{ root_password }}"
+        - mysql_databases:
+          - name: "{{ db_name }}"
+            encoding: utf8
+            collation: utf8_unicode_ci
+        - mysql_users:
+          - name: "{{ user }}"
+            host: "%"
+            password: "{{ password }}"
+            priv: "{{ db_name }}.*:ALL"
+
+- name: Nginx
+  hosts: all
+  become: true
+  tags:
+    - nginx
+  vars:
+    - root_path: /etc/nginx
+    - app_conf: wordpress
+  roles:
+    - role: nginxinc.nginx
+  tasks:
+    - name: copy nginx.conf
+      copy:
+        src: files/nginx.conf
+        dest: "{{ root_path}}/nginx.conf"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: "0644"
+        backup: yes
+    - name: set up sites-available
+      file:
+        path: "{{ root_path }}/sites-available"
+        state: directory
+        mode: "0755"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+    - name: set up sites-enabled
+      file:
+        path: "{{ root_path }}/sites-enabled"
+        state: directory
+        mode: "0755"
+    - name: copy wordpress configuration
+      copy:
+        src: "files/{{ app_conf }}"
+        dest: "{{ root_path }}/sites-available/{{ app_conf }}"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: "0644"
+        backup: yes
+    - name: symlink wordpress to sites-enabled
+      file:
+        src: "{{ root_path }}/sites-available/{{ app_conf }}"
+        dest: "{{ root_path }}/sites-enabled/{{ app_conf }}"
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        state: link
+
+- name: Wordpress
+  hosts: all
+  become: true
+  tags:
+    - wordpress
+  vars:
+    installation_path: /var/www/wordpress
+  tasks:
+    - name: create directory
+      file:
+        path: "{{ installation_path }}"
+        state: directory
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"
+        mode: '0755'
+    - name: download and unpack Wordpress
+      unarchive:
+        src: https://wordpress.org/latest.tar.gz
+        dest: /var/www
+        remote_src: yes
+        creates: "{ installation_path }}"
+    - name: set ownership
+      file:
+        path: "{{ installation_path }}"
+        state: directory
+        recurse: yes
+        owner: "{{ nginx_user }}"
+        group: "{{ nginx_user }}"

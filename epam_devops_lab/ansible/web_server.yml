@@ -1,0 +1,16 @@
+---
+- name: Initialize connection
+  hosts: localhost
+  tasks:
+    - set_fact:
+        target_host: "{{ hostvars[inventory_hostname]['groups']['web_server'][0] }}"
+    - name: get target fingerprint
+      known_hosts:
+        name: "{{ target_host }}"
+        key: "{{ lookup('pipe', 'ssh-keyscan {{ target_host }},`dig +short {{ target_host }}`') }}"
+
+- name: Set up simple web
+  hosts: web_server
+  become: true
+  roles:
+    - role: simple_web

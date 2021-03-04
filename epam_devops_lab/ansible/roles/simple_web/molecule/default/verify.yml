@@ -1,0 +1,47 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  vars:
+    conf_file_path: /etc/nginx/nginx.conf
+    web_root: /var/www
+    web_file: index.html
+  tasks:
+  - name: Nginx - test package status
+    package:
+      name: nginx
+      state: installed
+    check_mode: yes
+    register: pkg_status
+  - name: Nginx - test package is installed
+    assert:
+      that:
+        - not pkg_status.changed
+  - name: Nginx - test nginx.conf
+    stat:
+      path: "{{ conf_file_path }}"
+    register: remote_file
+  - name: Nginx - assert nginx.conf
+    assert:
+      that:
+        - remote_file.stat.exists
+        - remote_file.stat.isreg
+        - remote_file.stat.mode == "0644"
+  - name: Nginx - test nginx.conf content
+    shell: "head -n 1 {{ conf_file_path }} | grep custom"
+    changed_when: false
+  - name: "Web - test {{ web_file }}"
+    stat:
+      path: "{{ web_root }}/{{ web_file }}"
+    register: remote_file
+  - name: "Web - assert {{ web_file }}"
+    register: remote_file
+    assert:
+      that:
+        - remote_file.stat.exists
+        - remote_file.stat.isreg
+        - remote_file.stat.pw_name == "nginx"
+        - remote_file.stat.gr_name == "nginx"
+        - remote_file.stat.mode == "0644"

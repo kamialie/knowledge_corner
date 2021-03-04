@@ -1,0 +1,78 @@
+pipeline {
+	agent any
+	environment {
+		PATH = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+		VIRTUAL_ENV = "/home/ubuntu/virtual_env"
+	}
+	options {
+		ansiColor('xterm')
+	}
+	stages {
+		stage ('Display versions') {
+			steps {
+				sh '''#!/bin/bash
+				source $VIRTUAL_ENV/bin/activate
+				terraform --version
+				ansible --version
+				'''
+			}
+		}
+		stage ('Terraform init and plan') {
+			steps {
+				dir("terraform") {
+					withCredentials([usernamePassword(credentialsId: 'aws_cred', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+						sh '''
+						terraform init
+						terraform plan
+						'''
+					}
+				}
+			}
+		}
+		stage ('Approval') {
+			steps {
+				script {
+                    env.TERRAFORM_APPLY = input(
+											message: 'Apply terraform?',
+											parameters: [booleanParam(defaultValue: false, description: '', name: 'TERRAFORM_APPLY')]
+										)
+                }
+			}
+		}
+		stage ('Terraform apply') {
+			when {
+				environment name: 'TERRAFORM_APPLY', value: 'true'
+			}
+			steps {
+				dir("terraform") {
+					withCredentials([usernamePassword(credentialsId: 'aws_cred', passwordVariable: 'AWS_SECRET_ACCESS_KEY', usernameVariable: 'AWS_ACCESS_KEY_ID')]) {
+						sh '''
+						terraform apply -auto-approve
+						'''
+					}
+				}
+			}
+		}
+		stage ('Deploy simple web server') {
+			when {
+				environment name: 'TERRAFORM_APPLY', value: 'true'
+			}
+			steps {
+				dir("ansible") {
+					withCredentials([sshUserPrivateKey(credentialsId: 'web_server_ssh', keyFileVariable: 'SSH_KEY_PATH', passphraseVariable: '', usernameVariable: '')]) {
+						sh '''#!/bin/bash
+						source $VIRTUAL_ENV/bin/activate
+						cp $SSH_KEY_PATH epam_learning.pem
+						ansible-playbook -i inventory web_server.yml
+						'''
+					}
+				}
+			}
+		}
+	}
+  post {
+    always {
+      cleanWs()
+    }
+  }
+}

@@ -1,0 +1,45 @@
+---
+- name: "install Nginx"
+  package:
+    name: nginx
+    state: present
+- name: "copy over nginx.conf"
+  template:
+    src: templates/nginx.j2
+    dest: "/etc/nginx/nginx.conf"
+    mode: "0644"
+- name: "CentOS: create www dir"
+  file:
+    path: "{{ web_root }}"
+    state: directory
+    owner: "{{ cent_nginx_user }}"
+    group: "{{ cent_nginx_group }}"
+  when: ansible_distribution == 'CentOS'
+- name: "Ubuntu: create www dir"
+  file:
+    path: "{{ web_root }}"
+    state: directory
+    owner: "{{ ub_nginx_user }}"
+    group: "{{ ub_nginx_group }}"
+  when: ansible_distribution == 'Ubuntu'
+- name: "CentOS: copy over index.html"
+  template:
+    src: templates/index.j2
+    dest: "{{ web_root }}/{{ web_file }}"
+    owner: "{{ cent_nginx_user }}"
+    group: "{{ cent_nginx_group }}"
+    mode: "0644"
+  when: ansible_distribution == 'CentOS'
+- name: "Ubuntu: copy over index.html"
+  template:
+    src: templates/index.j2
+    dest: "{{ web_root }}/{{ web_file }}"
+    owner: "{{ ub_nginx_user }}"
+    group: "{{ ub_nginx_group }}"
+    mode: "0644"
+  when: ansible_distribution == 'Ubuntu'
+- name: "start and enable Nginx"
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes

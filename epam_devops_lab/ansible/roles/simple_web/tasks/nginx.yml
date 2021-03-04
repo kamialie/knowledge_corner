@@ -1,0 +1,5 @@
+---
+- name: "install Nginx"
+  package:
+    name: nginx
+    state: installed

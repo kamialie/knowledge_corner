@@ -1,0 +1,31 @@
+{
+  "variables": {
+    "username": "{{ env `BASE_USERNAME` }}",
+    "password": "{{ env `BASE_PASSWORD` }}"
+  },
+  "builders":[
+    {
+      "checksum": "sha256:394dda26d856d557147024818867be5ba5c001f9e2292218ec647288f92c9016",
+	  "format": "ova",
+      "output_filename": "lemp",
+      "shutdown_command": "echo 'packer' | sudo -S shutdown -P now",
+      "source_path": "base.ova",
+      "ssh_password": "{{ user `password` }}",
+      "ssh_username": "{{ user `username` }}",
+      "type": "virtualbox-ovf"
+    }
+  ],
+  "provisioners":[
+    {
+      "type": "shell",
+      "inline": "echo 'hello world!' > $HOME/kek"
+    },
+	{
+		"type": "ansible",
+		"extra_arguments": [
+			"-t", "php,sql,nginx,wordpress", "-i", "inventory.yml"
+		],
+		"playbook_file": "lemp_playbook.yml"
+	}
+  ]
+}

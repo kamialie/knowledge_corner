@@ -1,3 +1,6 @@
+### Ansible ###
+*.retry
+
 ### Terraform ###
 # Local .terraform directories
 **/.terraform/*
@@ -48,3 +51,13 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+### Vagrant ###
+# General
+.vagrant/
+
+# Log files (if you are creating logs in debug mode, uncomment this)
+# *.log
+
+### Vagrant Patch ###
+*.box

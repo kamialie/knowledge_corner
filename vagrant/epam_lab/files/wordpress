@@ -1,5 +1,10 @@
 server {
-	listen 80;
+	#listen 80;
+	listen 443 http2 ssl;
+
+	ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+	ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+	ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
 	root /var/www/wordpress;
 	index index.php;

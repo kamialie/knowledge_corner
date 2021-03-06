@@ -1,5 +1,7 @@
-### SSH ###
+### Secrets ###
 *.pem
+*.key
+*.crt
 
 ### Ansible ###
 *.retry

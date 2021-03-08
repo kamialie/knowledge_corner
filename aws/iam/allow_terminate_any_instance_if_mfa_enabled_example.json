@@ -1,0 +1,16 @@
+{
+	"Version": "2020-01-01",
+	"Statement": [
+		{
+			"Sid": "VisualEditor",
+			"Effect": "Allow",
+			"Action": "ec2:TerminateInstances",
+			"Resource": "arn:aws:ec2:us-east-1::instance/*",
+			"Condition": {
+				"BoolIfExists" : {
+					"aws:MultiFactorAuthentication": true
+				}
+			}
+		}
+	]
+}

@@ -2,7 +2,7 @@
 
 #check if file path is specified
 if [[ $# != 1 ]]; then
-	echo "Please, specify the path to a csv file as the only argument"
+	echo "usage: ./sorter.sh path_to_csv_file"
 	exit 1
 fi
 

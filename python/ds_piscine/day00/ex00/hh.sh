@@ -2,7 +2,7 @@
 
 # check if jq is installed
 if ! command -v jq > /dev/null 2>&1; then
-	echo "please install jq tool"
+	echo "Please, install jq tool"
 	exit 1
 fi
 

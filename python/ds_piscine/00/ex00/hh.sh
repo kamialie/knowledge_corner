@@ -6,7 +6,7 @@ if ! command -v jq > /dev/null 2>&1; then
 	exit 1
 fi
 
-read -p "Please, specify the  name of a vacancy: " vacancy
+read -p "Please, specify the name of a vacancy: " vacancy
 
 BASE_URL="https://api.hh.ru"
 

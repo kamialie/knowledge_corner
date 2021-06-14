@@ -6,7 +6,8 @@ if [[ $# != 1 ]]; then
 	exit 1
 fi
 
+head -n1 $1 > hh_positions.csv
 
-sed -r '/Senior|Middle|Junior/!s/([^,]*),([^,]*),.*,/\1,\2,"-",/' $1 | \
-	sed -r 's/([^,]*),([^,]*),.*((Senior|Middle|Junior)\/(Senior|Middle|Junior)).*,/\1,\2,"\3",/' | \
-	sed -r 's/([^,]*),([^,]*),.*[^\/](Senior|Middle|Junior)[^\/].*,/\1,\2,"\3",/'
+tail -n+2 $1 | sed -r '/Senior|Middle|Junior/!s/([^,]*),([^,]*),".*",/\1,\2,"-",/' | \
+	sed -r 's/([^,]*),([^,]*),".*((Senior|Middle|Junior)\/(Senior|Middle|Junior)).*",/\1,\2,"\3",/' | \
+	sed -r 's/([^,]*),([^,]*),.*[^\/](Senior|Middle|Junior)[^\/]*",/\1,\2,"\3",/' >> hh_positions.csv

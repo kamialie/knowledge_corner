@@ -9,6 +9,7 @@ fi
 #check if file path is specified
 if [[ $# != 1 ]]; then
 	echo "Please, specify the path to a JSON file as the only argument"
+	exit 1
 fi
 
 echo '.id","created_at","name","has_test","alternate_url"' > hh.csv

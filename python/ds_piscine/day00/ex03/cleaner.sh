@@ -6,5 +6,7 @@ if [[ $# != 1 ]]; then
 	exit 1
 fi
 
+
 sed -r '/Senior|Middle|Junior/!s/([^,]*),([^,]*),.*,/\1,\2,"-",/' $1 | \
-	sed -r 's/([^,]*),([^,]*),.*(Senior|Middle|Junior).*,/\1,\2,"\3",/'
+	sed -r 's/([^,]*),([^,]*),.*((Senior|Middle|Junior)\/(Senior|Middle|Junior)).*,/\1,\2,"\3",/' | \
+	sed -r 's/([^,]*),([^,]*),.*[^\/](Senior|Middle|Junior)[^\/].*,/\1,\2,"\3",/'

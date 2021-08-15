@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.12.1
+    environment:
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.12.1
+    environment:
+      ELASTICSEARCH_HOSTS: http://search:9200
+    ports:
+      - "5601:5601"
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.13.2
+    volumes:
+      - ./logstash/files:/usr/share/logstash/files
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+    entrypoint: ["sleep", "infinity"]
+
+networks:
+  default:
+    name: elastic

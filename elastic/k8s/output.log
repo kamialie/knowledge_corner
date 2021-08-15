@@ -1,0 +1,98 @@
+envPath - /texpress/uat/
+{"Timestamp":"2021-07-21T06:34:03.6079202+00:00","Level":"Information","MessageTemplate":"Start installing Hangfire SQL objects...","Properties":{"SourceContext":"Hangfire.PostgreSql.PostgreSqlStorage","Application":"Communication.PnrReader"}}
+{"Timestamp":"2021-07-21T06:34:03.6384651+00:00","Level":"Information","MessageTemplate":"Hangfire SQL objects installed.","Properties":{"SourceContext":"Hangfire.PostgreSql.PostgreSqlStorage","Application":"Communication.PnrReader"}}
+{"Timestamp":"2021-07-21T06:34:03.6590817+00:00","Level":"Debug","MessageTemplate":"Hosting starting","Properties":{"EventId":{"Id":3},"SourceContext":"Microsoft.AspNetCore.Hosting.Diagnostics","Application":"Communication.PnrReader"}}
+Application startup exception: System.AggregateException: One or more errors occurred. (State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.)
+ ---> Dapr.DaprException: State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.
+ ---> Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Connection refused SocketException: Connection refused", DebugException="System.Net.Http.HttpRequestException: Connection refused
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean allowHttp2, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp2ConnectionAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithRetryAsync(HttpRequestMessage request, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+   at Grpc.Net.Client.Internal.GrpcCall`2.RunCall(HttpRequestMessage request, Nullable`1 timeout)")
+   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   at Dapr.Client.DaprClient.GetStateEntryAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   at WP.Logger.Service.Trace.TraceInfoStorage.GetStateEntryAsync[T](String storeName, String id) in /src/Main/WP.Logger.Service/Trace/TraceInfoStorage.cs:line 18
+   at WP.Logger.Service.Trace.TraceInfoService.GetTraceInfo(String traceId) in /src/Main/WP.Logger.Service/Trace/TraceInfoService.cs:line 28
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
+   at System.Threading.Tasks.Task`1.get_Result()
+   at WP.Logger.Service.LogBuilder.Build(LogData data) in /src/Main/WP.Logger.Service/LogBuilder.cs:line 27
+   at WP.Logger.Service.LoggerAdapter`1.AppendLogData(Object logData, LogLevel logLevel, String message, Exception exception) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 90
+   at WP.Logger.Service.LoggerAdapter`1.LogDebug(Object logObject, Exception e, String message) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 55
+   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, Exception exception, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 90
+   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 67
+   at WorkflowRunner.Services.NugetAssemblyLoader.GetAssemblies(CancellationToken cancellationToken) in /src/Main/WorkflowRunner/Services/NugetAssemblyLoader.cs:line 34
+   at WorkflowRunner.WorkflowStore.Init() in /src/Main/WorkflowRunner/Services/WorkflowStore.cs:line 41
+   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.<>c__DisplayClass0_0.<<UseWorkflowRunner>b__0>d.MoveNext() in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 16
+--- End of stack trace from previous location where exception was thrown ---
+   at Nito.AsyncEx.Synchronous.TaskExtensions.WaitAndUnwrapException(Task task)
+   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.UseWorkflowRunner(IApplicationBuilder app) in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 19
+   at WorkflowProcessor.Startup.Configure(IApplicationBuilder app, IWebHostEnvironment env) in /src/Main/WorkflowProcessor/Startup.cs:line 119
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.Invoke(Object instance, IApplicationBuilder builder)
+   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.<>c__DisplayClass4_0.<Build>b__0(IApplicationBuilder builder)
+   at Microsoft.AspNetCore.Hosting.ConventionBasedStartup.Configure(IApplicationBuilder app)
+   at Microsoft.AspNetCore.Mvc.Filters.MiddlewareFilterBuilderStartupFilter.<>c__DisplayClass0_0.<Configure>g__MiddlewareFilterBuilder|0(IApplicationBuilder builder)
+   at App.Metrics.AspNetCore.Tracking.DefaultMetricsTrackingStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsTrackingMiddleware|0(IApplicationBuilder builder)
+   at App.Metrics.AspNetCore.Endpoints.DefaultMetricsEndpointsStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsEndpoints|0(IApplicationBuilder builder)
+   at Microsoft.AspNetCore.HostFilteringStartupFilter.<>c__DisplayClass0_0.<Configure>b__0(IApplicationBuilder app)
+   at Microsoft.AspNetCore.Hosting.WebHost.BuildApplication()
+{"Timestamp":"2021-07-21T06:34:03.8069999+00:00","Level":"Fatal","MessageTemplate":"Application startup exception","Exception":"System.AggregateException: One or more errors occurred. (State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.)\n ---> Dapr.DaprException: State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.\n ---> Grpc.Core.RpcException: Status(StatusCode=\"Internal\", Detail=\"Error starting gRPC call. HttpRequestException: Connection refused SocketException: Connection refused\", DebugException=\"System.Net.Http.HttpRequestException: Connection refused\n ---> System.Net.Sockets.SocketException (111): Connection refused\n   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean allowHttp2, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.GetHttp2ConnectionAsync(HttpRequestMessage request, CancellationToken cancellationToken)\n   at System.Net.Http.HttpConnectionPool.SendWithRetryAsync(HttpRequestMessage request, Boolean doRequestAuth, CancellationToken cancellationToken)\n   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)\n   at Grpc.Net.Client.Internal.GrpcCall`2.RunCall(HttpRequestMessage request, Nullable`1 timeout)\")\n   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)\n   --- End of inner exception stack trace ---\n   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)\n   at Dapr.Client.DaprClient.GetStateEntryAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)\n   at WP.Logger.Service.Trace.TraceInfoStorage.GetStateEntryAsync[T](String storeName, String id) in /src/Main/WP.Logger.Service/Trace/TraceInfoStorage.cs:line 18\n   at WP.Logger.Service.Trace.TraceInfoService.GetTraceInfo(String traceId) in /src/Main/WP.Logger.Service/Trace/TraceInfoService.cs:line 28\n   --- End of inner exception stack trace ---\n   at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)\n   at System.Threading.Tasks.Task`1.get_Result()\n   at WP.Logger.Service.LogBuilder.Build(LogData data) in /src/Main/WP.Logger.Service/LogBuilder.cs:line 27\n   at WP.Logger.Service.LoggerAdapter`1.AppendLogData(Object logData, LogLevel logLevel, String message, Exception exception) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 90\n   at WP.Logger.Service.LoggerAdapter`1.LogDebug(Object logObject, Exception e, String message) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 55\n   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, Exception exception, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 90\n   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 67\n   at WorkflowRunner.Services.NugetAssemblyLoader.GetAssemblies(CancellationToken cancellationToken) in /src/Main/WorkflowRunner/Services/NugetAssemblyLoader.cs:line 34\n   at WorkflowRunner.WorkflowStore.Init() in /src/Main/WorkflowRunner/Services/WorkflowStore.cs:line 41\n   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.<>c__DisplayClass0_0.<<UseWorkflowRunner>b__0>d.MoveNext() in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 16\n--- End of stack trace from previous location where exception was thrown ---\n   at Nito.AsyncEx.Synchronous.TaskExtensions.WaitAndUnwrapException(Task task)\n   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.UseWorkflowRunner(IApplicationBuilder app) in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 19\n   at WorkflowProcessor.Startup.Configure(IApplicationBuilder app, IWebHostEnvironment env) in /src/Main/WorkflowProcessor/Startup.cs:line 119\n   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)\n   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)\n   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.Invoke(Object instance, IApplicationBuilder builder)\n   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.<>c__DisplayClass4_0.<Build>b__0(IApplicationBuilder builder)\n   at Microsoft.AspNetCore.Hosting.ConventionBasedStartup.Configure(IApplicationBuilder app)\n   at Microsoft.AspNetCore.Mvc.Filters.MiddlewareFilterBuilderStartupFilter.<>c__DisplayClass0_0.<Configure>g__MiddlewareFilterBuilder|0(IApplicationBuilder builder)\n   at App.Metrics.AspNetCore.Tracking.DefaultMetricsTrackingStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsTrackingMiddleware|0(IApplicationBuilder builder)\n   at App.Metrics.AspNetCore.Endpoints.DefaultMetricsEndpointsStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsEndpoints|0(IApplicationBuilder builder)\n   at Microsoft.AspNetCore.HostFilteringStartupFilter.<>c__DisplayClass0_0.<Configure>b__0(IApplicationBuilder app)\n   at Microsoft.AspNetCore.Hosting.WebHost.BuildApplication()","Properties":{"EventId":{"Id":6},"SourceContext":"Microsoft.AspNetCore.Hosting.WebHost","Application":"Communication.PnrReader"}}
+{"Timestamp":"2021-07-21T06:34:03.8084745+00:00","Level":"Debug","MessageTemplate":"Hosting shutdown","Properties":{"EventId":{"Id":5},"SourceContext":"Microsoft.AspNetCore.Hosting.Diagnostics","Application":"Communication.PnrReader"}}
+Unhandled exception. System.AggregateException: One or more errors occurred. (State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.)
+ ---> Dapr.DaprException: State operation failed: the Dapr endpoint indicated a failure. See InnerException for details.
+ ---> Grpc.Core.RpcException: Status(StatusCode="Internal", Detail="Error starting gRPC call. HttpRequestException: Connection refused SocketException: Connection refused", DebugException="System.Net.Http.HttpRequestException: Connection refused
+ ---> System.Net.Sockets.SocketException (111): Connection refused
+   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.ConnectHelper.ConnectAsync(String host, Int32 port, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean allowHttp2, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.GetHttp2ConnectionAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithRetryAsync(HttpRequestMessage request, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+   at Grpc.Net.Client.Internal.GrpcCall`2.RunCall(HttpRequestMessage request, Nullable`1 timeout)")
+   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Dapr.Client.DaprClientGrpc.GetStateAndETagAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   at Dapr.Client.DaprClient.GetStateEntryAsync[TValue](String storeName, String key, Nullable`1 consistencyMode, IReadOnlyDictionary`2 metadata, CancellationToken cancellationToken)
+   at WP.Logger.Service.Trace.TraceInfoStorage.GetStateEntryAsync[T](String storeName, String id) in /src/Main/WP.Logger.Service/Trace/TraceInfoStorage.cs:line 18
+   at WP.Logger.Service.Trace.TraceInfoService.GetTraceInfo(String traceId) in /src/Main/WP.Logger.Service/Trace/TraceInfoService.cs:line 28
+   --- End of inner exception stack trace ---
+   at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
+   at System.Threading.Tasks.Task`1.get_Result()
+   at WP.Logger.Service.LogBuilder.Build(LogData data) in /src/Main/WP.Logger.Service/LogBuilder.cs:line 27
+   at WP.Logger.Service.LoggerAdapter`1.AppendLogData(Object logData, LogLevel logLevel, String message, Exception exception) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 90
+   at WP.Logger.Service.LoggerAdapter`1.LogDebug(Object logObject, Exception e, String message) in /src/Main/WP.Logger.Service/LoggerAdapter.cs:line 55
+   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, Exception exception, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 90
+   at WP.Logger.Service.LoggerService`1.LogDebug(Object logObject, String message, LogSubCode subCode, AdditionalLogData additionalParams, String traceId, Int32 lineNumber, String caller, String sourceFilePath) in /src/Main/WP.Logger.Service/LoggerService.cs:line 67
+   at WorkflowRunner.Services.NugetAssemblyLoader.GetAssemblies(CancellationToken cancellationToken) in /src/Main/WorkflowRunner/Services/NugetAssemblyLoader.cs:line 34
+   at WorkflowRunner.WorkflowStore.Init() in /src/Main/WorkflowRunner/Services/WorkflowStore.cs:line 41
+   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.<>c__DisplayClass0_0.<<UseWorkflowRunner>b__0>d.MoveNext() in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 16
+--- End of stack trace from previous location where exception was thrown ---
+   at Nito.AsyncEx.Synchronous.TaskExtensions.WaitAndUnwrapException(Task task)
+   at WorkflowRunner.WorkflowRunnerAppBuilderExtensions.UseWorkflowRunner(IApplicationBuilder app) in /src/Main/WorkflowRunner/WorkflowRunnerAppBuilderExtensions.cs:line 19
+   at WorkflowProcessor.Startup.Configure(IApplicationBuilder app, IWebHostEnvironment env) in /src/Main/WorkflowProcessor/Startup.cs:line 119
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Object[] arguments, Signature sig, Boolean constructor, Boolean wrapExceptions)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.Invoke(Object instance, IApplicationBuilder builder)
+   at Microsoft.AspNetCore.Hosting.ConfigureBuilder.<>c__DisplayClass4_0.<Build>b__0(IApplicationBuilder builder)
+   at Microsoft.AspNetCore.Hosting.ConventionBasedStartup.Configure(IApplicationBuilder app)
+   at Microsoft.AspNetCore.Mvc.Filters.MiddlewareFilterBuilderStartupFilter.<>c__DisplayClass0_0.<Configure>g__MiddlewareFilterBuilder|0(IApplicationBuilder builder)
+   at App.Metrics.AspNetCore.Tracking.DefaultMetricsTrackingStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsTrackingMiddleware|0(IApplicationBuilder builder)
+   at App.Metrics.AspNetCore.Endpoints.DefaultMetricsEndpointsStartupFilter.<>c__DisplayClass0_0.<Configure>g__AddMetricsEndpoints|0(IApplicationBuilder builder)
+   at Microsoft.AspNetCore.HostFilteringStartupFilter.<>c__DisplayClass0_0.<Configure>b__0(IApplicationBuilder app)
+   at Microsoft.AspNetCore.Hosting.WebHost.BuildApplication()
+   at Microsoft.AspNetCore.Hosting.WebHost.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.WebHostExtensions.RunAsync(IWebHost host, CancellationToken token, String startupMessage)
+   at Microsoft.AspNetCore.Hosting.WebHostExtensions.RunAsync(IWebHost host, CancellationToken token, String startupMessage)
+   at Microsoft.AspNetCore.Hosting.WebHostExtensions.RunAsync(IWebHost host, CancellationToken token)
+   at Microsoft.AspNetCore.Hosting.WebHostExtensions.Run(IWebHost host)
+   at WorkflowProcessor.Program.Main(String[] args) in /src/Main/WorkflowProcessor/Program.cs:line 11

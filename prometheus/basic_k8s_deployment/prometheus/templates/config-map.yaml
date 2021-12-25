@@ -4,7 +4,7 @@ metadata:
   name: prometheus-server-conf
   labels:
     name: prometheus-server-conf
-  namespace: monitoring
+  namespace: {{ .Values.namespace.name }}
 data:
   prometheus.yml: |-
     global:
@@ -26,4 +26,3 @@ data:
           - role: node
         relabel_configs:
           - target_label: __address__
-            replacement: kubernetes.default.svc:443

@@ -1,0 +1,107 @@
+---
+- name: Containerd prerequisites
+  hosts: workers
+  become: true
+  vars:
+    kernel_modules:
+      - overlay
+      - br_netfilter
+    sysctl_k8s_cri_values:
+      - name: net.bridge.bridge-nf-call-iptables
+        value: 1
+      - name: net.ipv4.ip_forward
+        value: 1
+      - name: net.bridge.bridge-nf-call-ip6tables
+        value: 1
+  tasks:
+    #- name: test
+    #  debug:
+    #    msg: hello
+
+    - name: Load kernel modules
+      community.general.modprobe:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ kernel_modules }}"
+    - name: Enable kernel modules on boot
+      ansible.builtin.copy:
+        content: |
+          "{% for item in kernel_modules %}
+          item
+          {% endfor %}"
+        dest: /etc/modules-load.d/containerd.conf
+    - name: Set and persist sysctl values
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+      loop: "{{ sysctl_k8s_cri_values }}"
+- name: Install containerd
+  hosts: workers
+  become: true
+  tags:
+    - containerd
+  vars:
+    containerd_dir: /etc/containerd
+    containerd_config: "{{ containerd_dir }}/config.toml"
+  tasks:
+    - name: Install containerd
+      ansible.builtin.apt:
+        name: containerd
+        update_cache: yes
+    - name: Create containerd directory
+      ansible.builtin.file:
+        path: "{{ containerd_dir }}"
+        state: directory
+        mode: '0755'
+    - name: Create default configuration
+      ansible.builtin.shell:
+        cmd: containerd config default | sudo tee "{{ containerd_config }}"
+    - name: Set cgroup driver to systemd
+      ansible.builtin.lineinfile:
+        path: "{{ containerd_config }}"
+        regexp: '^(\s*)SystemdCgroup ='
+        line: '\1SystemdCgroup = true'
+        backrefs: yes
+    - name: Reload containerd
+      ansible.builtin.systemd:
+        name: containerd
+        enabled: yes
+        state: restarted
+- name: Install Kubernetes
+  hosts: workers
+  become: true
+  tags:
+    - kubernetes
+  vars:
+    version: "1.20.1-00"
+    packages:
+      - kubelet
+      - kubeadm
+      - kubectl
+  tasks:
+    - name: Add Google's apt repo gpg key
+      ansible.builtin.apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: Add Kubernetes apt repo
+      ansible.builtin.apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernetes
+    - name: Install Kubernetes packages
+      ansible.builtin.apt:
+        name: "{{ item }}={{ version }}"
+        state: present
+        update_cache: yes
+      loop: "{{ packages }}"
+    - name: Prevent Kubernetes packages from being upgraded
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop: "{{ packages }}"
+    - name: Enable kubelet
+      ansible.builtin.systemd:
+        name: kubelet
+        enabled: yes
+        masked: no

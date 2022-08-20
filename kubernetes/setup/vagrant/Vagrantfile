@@ -1,43 +1,37 @@
-ENV['VAGRANT_NO_PARALLEL'] = 'yes'
-
 Vagrant.configure(2) do |config|
 
-  config.ssh.extra_args = "-tt"
-  config.vm.provision "shell", path: "bootstrap.sh"
-  
-  # K8s master
-  config.vm.define "Kubernetes" do |kmaster|
+  config.vm.define "control-plane" do |node|
 
-    kmaster.vm.box = "bento/ubuntu-18.04"
-    kmaster.vm.hostname = "kmaster.example.com"
-    kmaster.vm.network = "private_network", ip: "172.42.42.100"
+    node.vm.box = "bento/ubuntu-20.04"
+    node.vm.hostname = "control-plane.cluster.com"
+    node.vm.network "private_network", type: "dhcp"
 
-    kmaster.vm.provider = "virtualbox" do |v|
-	  v.name = "kmaster"
-	  v.memory = 2048
-	  v.cpus = 2
+    node.vm.provider "virtualbox" do |vb|
+	  vb.name = "control-plane"
+	  vb.cpus = 2
+	  vb.memory = 2048
 	end
 
-    kmaster.vm.provision "shell", path: "bootstrap_kmaster.sh"
-
   end
 
-  NodeCount = 2
+  NodeCount = 1
 
-  # K8s worker
-  (1..NodeCount) .each do |i| |workernode|
-    config.vm.define "kworker#{i}"
-      workernode.vm.box = "bento/ubuntu-18.04"
-      workernode.vm.hostname = "kworker#{i}.example.com"
-      workernode.vm.network = "private_network", ip: "172.42.42.10#{i}"
+  (1..NodeCount) .each do |i|
 
-      workernode.vm.provider = "virtualbox" do |v|
-	    v.name = "kworker#{i}"
-	    v.memory = 1024 # 4096 for ES
-	    v.cpus = 1 # 2 for ES
+    config.vm.define "worker#{i}" do |node|
+
+      node.vm.box = "bento/ubuntu-20.04"
+      node.vm.hostname = "worker#{i}.cluster.com"
+      node.vm.network "private_network", type: "dhcp"
+
+      node.vm.provider "virtualbox" do |vb|
+	    vb.name = "worker#{i}"
+	    vb.cpus = 1
+	    vb.memory = 1024
 	  end
 
-      workernode.vm.provision "shell", path: "bootstrap_kworker.sh"
+    end
 
   end
+
 end

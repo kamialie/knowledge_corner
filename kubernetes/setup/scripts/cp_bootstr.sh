@@ -7,7 +7,7 @@
 # Get networking configuration
 wget https://docs.projectcalico.org/manifests/calico.yaml
 
-# Adjust cidr block (CALICO_IPV4POOL_CIDR setting) to ensure it doesn't overlap with other networks (this one will be used for pods)
+# Adjust cidr block (CALICO_IPV4POOL_CIDR setting) to ensure it does not overlap with other networks (this one will be used for pods)
 vim calico.yaml
 
 # cluster configuration
@@ -22,7 +22,7 @@ kubeadm config print init-defaults | tee ClusterConfiguration.yaml
 # apiVersion: kubelet.config.k8s.io/v1beta1
 # kind: KubeletConfiguration
 # cgroupDriver: systemd
-# 4. update kubernetesVerstion
+# 4. update kubernetesVersion
 
 # bootstrap cluster (control plane)
 sudo kubeadm init \
